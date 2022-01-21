@@ -139,7 +139,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Proces.cpp" />
+    <ClCompile Include="Processor.cpp" />
     <ClCompile Include="ProcessScheduling.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Proces.h" />
+    <ClInclude Include="Processor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,10 +1,209 @@
 #include <iostream>
+#include <vector>
+#include <string>
+#include "Proces.h"
+#include "Processor.h"
 
-int main()
-{
-    std::cout << "Hello World!\n";
+using std::vector;
+using std::string;
+using std::cout;
+using std::cin;
+
+bool isExpropriationStrategy(const int& strategyCode) {
+    return (strategyCode == 2 || strategyCode == 3 || strategyCode == 4 || strategyCode == 5);
 }
 
+void FCFS(vector<Proces>& stackProcess, vector<Processor>& stackProcesors) {
+    if (!stackProcess.empty()){
+
+    }
+}
+
+void SJF() {
+
+}
+void printProcessVector(vector<Proces>& vec) {
+    std::cout << "Stack of Processes: \n";
+    for (auto x : vec)
+        std::cout << "Idx: " << x.Index << " Prior: " << x.Priority << " RemTime: " << x.RemainingTimeToEndOfProces << "\n";
+}
+void printProcessorsVector(vector<Processor>& vec) {
+    std::cout << "Processors:  ";
+    for (auto x : vec)
+        std::cout << "Idx: " << x.Index << " Proces: " << x.ActualProces.Index << "    ";
+    std::cout << "\n";
+}
+void setOnEndOfStack(vector<Proces>& vec, const string& in_str) {
+    int currentTime = 0;
+    int processId = 0;
+    int prioryty = 0;
+    int remainingTime = 0;
+
+    string tmp = "";
+    int counter = 0;
+
+    if (in_str.length() < 7)    //1 3 5 7 - min lenght of data
+        return;
+
+    for (int i = 0; i < in_str.length(); i++)
+    {
+        if (in_str[i] == ' ' || i == in_str.length()) {
+            switch (counter)
+            {
+                case 0:
+                    currentTime = std::stoi(tmp);
+                    break;
+                case 1:
+                    processId = std::stoi(tmp);
+                    break;
+                case 2:
+                    prioryty = std::stoi(tmp);
+                    break;
+                case 3:
+                    remainingTime = std::stoi(tmp);
+                    counter = 0;
+                    vec.push_back(Proces(processId, prioryty, remainingTime));
+                    break;
+                default:
+                    std::cout << "\nError: void setOnEndOfStack(vector<Proces>&, const string&)" << "\n\n";
+                    break;
+            }
+            tmp = "";
+            counter++;
+        }
+        else {
+            tmp += in_str[i];
+        }
+    }
+    remainingTime = std::stoi(tmp);
+    vec.push_back(Proces(processId, prioryty, remainingTime));
+}
+void makeSortStrategy(const int& strategyCode, vector<Proces>& stackProcess, vector<Processor>& stackProcesors) {
+    switch (strategyCode)
+    {
+        case 0:
+            FCFS(stackProcess, stackProcesors);
+            break;
+        case 1:
+            SJF();
+            break;
+        default:
+            break;
+    }
+}
+void expropriation(const int& strategyCode, const int& timeToExpropriation,vector<Proces>& stackProcess, vector<Processor>& stackProcesors) {
+    if (isExpropriationStrategy(strategyCode))
+    {
+        for (int i = 0; i < stackProcesors.size(); i++)
+        {
+            if (stackProcesors[i].RemainingTimeToExpropriation == 0)
+            {
+                stackProcess.push_back(stackProcesors[i].ActualProces);
+                stackProcesors[i].ActualProces = Proces();
+                stackProcesors[i].RemainingTimeToExpropriation = timeToExpropriation;
+            }
+            if (stackProcesors[i].RemainingTimeToExpropriation < 0)
+            {
+                std::cout << "\n Error:  expropriation()  \n\n\n";
+            }
+        }
+    }
+}
+void takeOffOnStack(vector<Proces>& stackProcess, vector<Processor>& stackProcesors) {
+    for (int i = stackProcesors.size()-1; i >= 0; i--)
+    {
+        if (stackProcesors[i].ActualProces.Index != -1)                                        //-1  ->  brak procesu
+        {
+            if (stackProcesors[i].ActualProces.RemainingTimeToEndOfProces > 0)
+            {
+                stackProcess.insert(stackProcess.begin(), stackProcesors[i].ActualProces);          //dodanie elementu na poczatek
+                stackProcesors[i].ActualProces = Proces();
+                continue;
+            }
+            if (stackProcesors[i].ActualProces.RemainingTimeToEndOfProces == 0)
+                stackProcesors[i].ActualProces = Proces();
+            if (stackProcesors[i].ActualProces.RemainingTimeToEndOfProces < 0)
+                std::cout << "\n Error:  takeOffOnStack()  \n\n\n";
+        }
+    }
+}
+void setProcessToProcessors(vector<Proces>& stackProcess, vector<Processor>& stackProcesors) {
+    for (int i=0; i < stackProcesors.size(); i++)
+    {
+        if (i <= stackProcess.size() && stackProcess.size() != 0){
+            stackProcesors[i].ActualProces = stackProcess[0];
+            stackProcess.erase(stackProcess.begin());                                           //zabranie pierwszego elementu ze stosu 
+        }
+    }
+}
+void initProcessors(const int& count, const int& remainingTimeToExpropriation, vector<Processor>& stackProcesors) {
+    for (int i = 0; i < count; i++)
+    {
+        stackProcesors.push_back(Processor(i, remainingTimeToExpropriation));
+    }
+}
+void decreaseTime(const int& strategyCode, vector<Processor>& stackProcesors) {
+    for (int i = 0; i < stackProcesors.size(); i++) {
+        stackProcesors[i].ActualProces.RemainingTimeToEndOfProces--;
+        if (isExpropriationStrategy(strategyCode)) {
+            stackProcesors[i].RemainingTimeToExpropriation--;
+        }
+    }
+}
+
+//int main(int argc, char** argv)
+int main()
+{
+    //std::vector<std::string> arguments(argv, argv + argc);
+    int strategyCode = 0; // std::stoi(argv[1]);
+    int procesorsCount = 2; // std::stoi(argv[2]);
+    int remainingTimeToExpropriation = 2; // std::stoi(argv[3]);
+
+    
+
+    vector<Proces> stackProcess;
+    vector<Processor> stackProcesors;
+    initProcessors(procesorsCount, remainingTimeToExpropriation, stackProcesors);
+
+    while (1) 
+    {
+        string in_str;
+        //wczytaj linie - dopisz do stosu
+        getline(std::cin, in_str);
+        setOnEndOfStack(stackProcess, in_str);
+        //wywlasz
+        expropriation(strategyCode, remainingTimeToExpropriation, stackProcess, stackProcesors);
+        //sortuj
+        makeSortStrategy(strategyCode, stackProcess, stackProcesors);
+        //sciagnij na stos
+        takeOffOnStack(stackProcess, stackProcesors);
+        //obsadz
+
+        printProcessVector(stackProcess);                                           //print
+
+        setProcessToProcessors(stackProcess, stackProcesors);
+        //zmniejsz czas procesow i czas do wywlaszczenia
+
+
+        printProcessorsVector(stackProcesors);                                      //print
+
+        decreaseTime(strategyCode, stackProcesors);
+
+        //printProcessVector(vec);
+    }
+
+    std::cout << "---------- Main End ----------\n";
+}
+
+/*
+
+//          0 1 2 3 4 4 4 6 5 4
+        printProcessVector(stackProcess);
+        stackProcesors[0].ActualProces = Proces(9, 9, 9);
+        takeOffOnStack(stackProcess, stackProcesors);
+        std::cout << "--------------------\n";
+        printProcessVector(stackProcess);
+        return 0;
 
 
 
@@ -18,10 +217,7 @@ int main()
 
 
 
-
-
-
-
+*/
 
 
 
