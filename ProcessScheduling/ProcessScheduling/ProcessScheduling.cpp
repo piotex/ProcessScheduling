@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include<algorithm>
 #include "Proces.h"
 #include "Processor.h"
 
@@ -13,24 +14,34 @@ bool isExpropriationStrategy(const int& strategyCode) {
     return (strategyCode == 2 || strategyCode == 3 || strategyCode == 4 || strategyCode == 5);
 }
 
-void FCFS(vector<Proces>& stackProcess, vector<Processor>& stackProcesors) {
-    if (!stackProcess.empty()){
+void FCFS(vector<Proces>& stackProcess) {
+    //[czas] --[numer]-[priorytet]-[czas_wykonania]--[numer]-[priorytet]-[czas_wykonania]
+    //0 1 2 3 4 4 4 6 5 4
+    if (!stackProcess.empty()) {
 
     }
 }
-
-void SJF() {
-
+void SJF(vector<Proces>& stackProcess) {
+    //0 1 0 6 4 0 4 6 0 4 7 0 3
+    if (!stackProcess.empty()) {
+        std::sort(stackProcess.begin(), stackProcess.end(), [](const Proces& lhs, const Proces& rhs) {
+            return lhs.RemainingTimeToEndOfProces < rhs.RemainingTimeToEndOfProces;
+        });
+    }
 }
+
+
+
 void printProcessVector(vector<Proces>& vec) {
+    std::cout << "-----------------\n";
     std::cout << "Stack of Processes: \n";
     for (auto x : vec)
         std::cout << "Idx: " << x.Index << " Prior: " << x.Priority << " RemTime: " << x.RemainingTimeToEndOfProces << "\n";
+    std::cout << "-----------------\n";
 }
 void printProcessorsVector(vector<Processor>& vec) {
-    std::cout << "Processors:  ";
     for (auto x : vec)
-        std::cout << "Idx: " << x.Index << " Proces: " << x.ActualProces.Index << "    ";
+        std::cout << "Processor: " << x.Index << " Proces: " << x.ActualProces.Index << "    ";
     std::cout << "\n";
 }
 void setOnEndOfStack(vector<Proces>& vec, const string& in_str) {
@@ -82,10 +93,10 @@ void makeSortStrategy(const int& strategyCode, vector<Proces>& stackProcess, vec
     switch (strategyCode)
     {
         case 0:
-            FCFS(stackProcess, stackProcesors);
+            FCFS(stackProcess);
             break;
         case 1:
-            SJF();
+            SJF(stackProcess);
             break;
         default:
             break;
@@ -155,7 +166,7 @@ void decreaseTime(const int& strategyCode, vector<Processor>& stackProcesors) {
 int main()
 {
     //std::vector<std::string> arguments(argv, argv + argc);
-    int strategyCode = 0; // std::stoi(argv[1]);
+    int strategyCode = 1; // std::stoi(argv[1]);
     int procesorsCount = 2; // std::stoi(argv[2]);
     int remainingTimeToExpropriation = 2; // std::stoi(argv[3]);
 
