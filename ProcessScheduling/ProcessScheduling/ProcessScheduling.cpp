@@ -43,15 +43,15 @@ void SRTF(vector<Proces>& stackProcess) {
         });
     }
 }
-void PrioritySortFCFS(vector<Proces>& stackProcess) {
-    //0 1 9 2 2 8 2 3 7 2 4 6 2 5 5 2
+void PrioritySortFCFS_withExpropriation(vector<Proces>& stackProcess) {
+    //0 1 9 5 2 8 5 3 7 5 4 6 5 5 5 5
     if (!stackProcess.empty()) {
         std::sort(stackProcess.begin(), stackProcess.end(), [](const Proces& lhs, const Proces& rhs) {
             return lhs.Priority < rhs.Priority;
         });
     }
 }
-void PrioritySortSRTF(vector<Proces>& stackProcess) {
+void PrioritySortSRTF_withExpropriation(vector<Proces>& stackProcess) {
     //0 1 99 1 2 2 3 3 2 2 4 2 3
     if (!stackProcess.empty()) {
         std::sort(stackProcess.begin(), stackProcess.end(), [](const Proces& lhs, const Proces& rhs) {
@@ -65,7 +65,14 @@ void PrioritySortSRTF(vector<Proces>& stackProcess) {
         });
     }
 }
-
+void PrioritySortFCFS(vector<Proces>& stackProcess) {
+    //0 1 9 2 2 8 2 3 7 2 4 6 2 5 5 2
+    if (!stackProcess.empty()) {
+        std::sort(stackProcess.begin(), stackProcess.end(), [](const Proces& lhs, const Proces& rhs) {
+            return lhs.Priority < rhs.Priority;
+        });
+    }
+}
 
 void printProcessVector(vector<Proces>& vec) {
     std::cout << "-----------------\n";
@@ -142,10 +149,13 @@ void makeSortStrategy(const int& strategyCode, vector<Proces>& stackProcess, vec
             RR(stackProcess);
             break;
         case 4:
-            PrioritySortFCFS(stackProcess);
+            PrioritySortFCFS_withExpropriation(stackProcess);
             break;
         case 5:
-            PrioritySortSRTF(stackProcess);
+            PrioritySortSRTF_withExpropriation(stackProcess);
+            break;
+        case 6:
+            PrioritySortFCFS(stackProcess);
             break;
         default:
             break;
@@ -216,15 +226,15 @@ void decreaseTime(const int& strategyCode, vector<Processor>& stackProcesors) {
 
 
 
-//int main(int argc, char** argv)
-int main()
+int main(int argc, char** argv)
+//int main()
 {
     //std::vector<std::string> arguments(argv, argv + argc);
-    int strategyCode = 5; // std::stoi(argv[1]);
+    int strategyCode = std::stoi(argv[1]); //5; // std::stoi(argv[1]);
 
 
-    int procesorsCount = 2; // std::stoi(argv[2]);
-    int remainingTimeToExpropriation = 3; // std::stoi(argv[3]);
+    int procesorsCount = std::stoi(argv[2]); //2; // std::stoi(argv[2]);
+    int remainingTimeToExpropriation = std::stoi(argv[3]); //3; // std::stoi(argv[3]);
 
     
 
