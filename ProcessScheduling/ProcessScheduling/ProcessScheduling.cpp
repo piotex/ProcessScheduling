@@ -51,6 +51,20 @@ void PrioritySortFCFS(vector<Proces>& stackProcess) {
         });
     }
 }
+void PrioritySortSRTF(vector<Proces>& stackProcess) {
+    //0 1 99 1 2 2 3 3 2 2 4 2 3
+    if (!stackProcess.empty()) {
+        std::sort(stackProcess.begin(), stackProcess.end(), [](const Proces& lhs, const Proces& rhs) {
+            if (lhs.Priority < rhs.Priority) return true;
+            if (rhs.Priority < lhs.Priority) return false;
+
+            if (lhs.RemainingTimeToEndOfProces < rhs.RemainingTimeToEndOfProces) return true;
+            if (rhs.RemainingTimeToEndOfProces < lhs.RemainingTimeToEndOfProces) return false;
+
+            return false;
+        });
+    }
+}
 
 
 void printProcessVector(vector<Proces>& vec) {
@@ -128,7 +142,10 @@ void makeSortStrategy(const int& strategyCode, vector<Proces>& stackProcess, vec
             RR(stackProcess);
             break;
         case 4:
-            PrioritySortFCFS(stackProcess);     
+            PrioritySortFCFS(stackProcess);
+            break;
+        case 5:
+            PrioritySortSRTF(stackProcess);
             break;
         default:
             break;
@@ -203,7 +220,7 @@ void decreaseTime(const int& strategyCode, vector<Processor>& stackProcesors) {
 int main()
 {
     //std::vector<std::string> arguments(argv, argv + argc);
-    int strategyCode = 4; // std::stoi(argv[1]);
+    int strategyCode = 5; // std::stoi(argv[1]);
 
 
     int procesorsCount = 2; // std::stoi(argv[2]);
