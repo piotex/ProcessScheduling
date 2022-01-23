@@ -29,6 +29,14 @@ void SJF(vector<Proces>& stackProcess) {
         });
     }
 }
+void SRTF(vector<Proces>& stackProcess) {
+    //0 1 0 10 2 0 11 3 0 15 4 0 7
+    if (!stackProcess.empty()) {
+        std::sort(stackProcess.begin(), stackProcess.end(), [](const Proces& lhs, const Proces& rhs) {
+            return lhs.RemainingTimeToEndOfProces < rhs.RemainingTimeToEndOfProces;
+        });
+    }
+}
 
 
 
@@ -90,6 +98,8 @@ void setOnEndOfStack(vector<Proces>& vec, const string& in_str) {
     vec.push_back(Proces(processId, prioryty, remainingTime));
 }
 void makeSortStrategy(const int& strategyCode, vector<Proces>& stackProcess, vector<Processor>& stackProcesors) {
+
+
     switch (strategyCode)
     {
         case 0:
@@ -97,6 +107,9 @@ void makeSortStrategy(const int& strategyCode, vector<Proces>& stackProcess, vec
             break;
         case 1:
             SJF(stackProcess);
+            break;
+        case 2:
+            SRTF(stackProcess);
             break;
         default:
             break;
@@ -162,13 +175,15 @@ void decreaseTime(const int& strategyCode, vector<Processor>& stackProcesors) {
     }
 }
 
+
+
 //int main(int argc, char** argv)
 int main()
 {
     //std::vector<std::string> arguments(argv, argv + argc);
-    int strategyCode = 1; // std::stoi(argv[1]);
+    int strategyCode = 2; // std::stoi(argv[1]);
     int procesorsCount = 2; // std::stoi(argv[2]);
-    int remainingTimeToExpropriation = 2; // std::stoi(argv[3]);
+    int remainingTimeToExpropriation = 3; // std::stoi(argv[3]);
 
     
 
@@ -186,7 +201,7 @@ int main()
         expropriation(strategyCode, remainingTimeToExpropriation, stackProcess, stackProcesors);
         //sortuj
         makeSortStrategy(strategyCode, stackProcess, stackProcesors);
-        //sciagnij na stos
+        //sciagnij z procka na stos
         takeOffOnStack(stackProcess, stackProcesors);
         //obsadz
 
