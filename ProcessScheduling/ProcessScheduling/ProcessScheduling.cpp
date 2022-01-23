@@ -21,6 +21,12 @@ void FCFS(vector<Proces>& stackProcess) {
 
     }
 }
+void RR(vector<Proces>& stackProcess) {
+    //0 1 0 2 2 0 8 3 0 6 4 0 15
+    if (!stackProcess.empty()) {
+
+    }
+}
 void SJF(vector<Proces>& stackProcess) {
     //0 1 0 6 4 0 4 6 0 4 7 0 3
     if (!stackProcess.empty()) {
@@ -52,11 +58,11 @@ void printProcessorsVector(vector<Processor>& vec) {
         std::cout << "Processor: " << x.Index << " Proces: " << x.ActualProces.Index << "    ";
     std::cout << "\n";
 }
-void setOnEndOfStack(vector<Proces>& vec, const string& in_str) {
+void setOnEndOfStack(vector<Proces>& vec, const string& in_str, const int& remainingTimeToExpropriation) {
     int currentTime = 0;
     int processId = 0;
     int prioryty = 0;
-    int remainingTime = 0;
+    int remainingTimeToProcesEnd = 0;
 
     string tmp = "";
     int counter = 0;
@@ -79,9 +85,9 @@ void setOnEndOfStack(vector<Proces>& vec, const string& in_str) {
                     prioryty = std::stoi(tmp);
                     break;
                 case 3:
-                    remainingTime = std::stoi(tmp);
+                    remainingTimeToProcesEnd = std::stoi(tmp);
                     counter = 0;
-                    vec.push_back(Proces(processId, prioryty, remainingTime));
+                    vec.push_back(Proces(processId, prioryty, remainingTimeToProcesEnd, remainingTimeToExpropriation));
                     break;
                 default:
                     std::cout << "\nError: void setOnEndOfStack(vector<Proces>&, const string&)" << "\n\n";
@@ -94,8 +100,8 @@ void setOnEndOfStack(vector<Proces>& vec, const string& in_str) {
             tmp += in_str[i];
         }
     }
-    remainingTime = std::stoi(tmp);
-    vec.push_back(Proces(processId, prioryty, remainingTime));
+    remainingTimeToProcesEnd = std::stoi(tmp);
+    vec.push_back(Proces(processId, prioryty, remainingTimeToProcesEnd, remainingTimeToExpropriation));
 }
 void makeSortStrategy(const int& strategyCode, vector<Proces>& stackProcess, vector<Processor>& stackProcesors) {
 
@@ -111,6 +117,9 @@ void makeSortStrategy(const int& strategyCode, vector<Proces>& stackProcess, vec
         case 2:
             SRTF(stackProcess);
             break;
+        case 3:
+            RR(stackProcess);
+            break;
         default:
             break;
     }
@@ -120,15 +129,18 @@ void expropriation(const int& strategyCode, const int& timeToExpropriation,vecto
     {
         for (int i = 0; i < stackProcesors.size(); i++)
         {
-            if (stackProcesors[i].RemainingTimeToExpropriation == 0)
+            if (stackProcesors[i].ActualProces.Index != -1)                                        //-1  ->  brak procesu
             {
-                stackProcess.push_back(stackProcesors[i].ActualProces);
-                stackProcesors[i].ActualProces = Proces();
-                stackProcesors[i].RemainingTimeToExpropriation = timeToExpropriation;
-            }
-            if (stackProcesors[i].RemainingTimeToExpropriation < 0)
-            {
-                std::cout << "\n Error:  expropriation()  \n\n\n";
+                if (stackProcesors[i].ActualProces.RemainingTimeToExpropriation == 0 )
+                {
+                    stackProcesors[i].ActualProces.RemainingTimeToExpropriation = timeToExpropriation;
+                    stackProcess.push_back(stackProcesors[i].ActualProces);
+                    stackProcesors[i].ActualProces = Proces();
+                }
+                if (stackProcesors[i].ActualProces.RemainingTimeToExpropriation < 0)
+                {
+                    std::cout << "\n Error:  expropriation()  \n\n\n";
+                }
             }
         }
     }
@@ -160,17 +172,17 @@ void setProcessToProcessors(vector<Proces>& stackProcess, vector<Processor>& sta
         }
     }
 }
-void initProcessors(const int& count, const int& remainingTimeToExpropriation, vector<Processor>& stackProcesors) {
+void initProcessors(const int& count, vector<Processor>& stackProcesors) {
     for (int i = 0; i < count; i++)
     {
-        stackProcesors.push_back(Processor(i, remainingTimeToExpropriation));
+        stackProcesors.push_back(Processor(i));
     }
 }
 void decreaseTime(const int& strategyCode, vector<Processor>& stackProcesors) {
     for (int i = 0; i < stackProcesors.size(); i++) {
         stackProcesors[i].ActualProces.RemainingTimeToEndOfProces--;
         if (isExpropriationStrategy(strategyCode)) {
-            stackProcesors[i].RemainingTimeToExpropriation--;
+            stackProcesors[i].ActualProces.RemainingTimeToExpropriation--;
         }
     }
 }
@@ -181,7 +193,9 @@ void decreaseTime(const int& strategyCode, vector<Processor>& stackProcesors) {
 int main()
 {
     //std::vector<std::string> arguments(argv, argv + argc);
-    int strategyCode = 2; // std::stoi(argv[1]);
+    int strategyCode = 3; // std::stoi(argv[1]);
+
+
     int procesorsCount = 2; // std::stoi(argv[2]);
     int remainingTimeToExpropriation = 3; // std::stoi(argv[3]);
 
@@ -189,14 +203,14 @@ int main()
 
     vector<Proces> stackProcess;
     vector<Processor> stackProcesors;
-    initProcessors(procesorsCount, remainingTimeToExpropriation, stackProcesors);
+    initProcessors(procesorsCount, stackProcesors);
 
     while (1) 
     {
         string in_str;
         //wczytaj linie - dopisz do stosu
         getline(std::cin, in_str);
-        setOnEndOfStack(stackProcess, in_str);
+        setOnEndOfStack(stackProcess, in_str, remainingTimeToExpropriation);
         //wywlasz
         expropriation(strategyCode, remainingTimeToExpropriation, stackProcess, stackProcesors);
         //sortuj
