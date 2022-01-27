@@ -1,3 +1,8 @@
+
+
+//./lf ./szer 2 2 2 < data.txt
+
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -86,9 +91,11 @@ void printProcessVector(vector<Proces>& vec) {
     std::cout << "-----------------\n";
 }
 void printProcessorsVector(vector<Processor>& vec) {
-    std::cout << _currentTime <<" ";
-    for (auto x : vec)
-        std::cout << x.ActualProces.Index << " ";         // [krok] [proces na proc 1] [proces na proc 2] ... [proces na proc n]
+    std::cout << _currentTime++ <<" ";
+    for (auto x : vec){
+        //std::cout << x.ActualProces.Index << " ";         // [krok] [proces na proc 1] [proces na proc 2] ... [proces na proc n]
+        printf(" %d ",x.ActualProces.Index);
+    }
     std::cout << "\n";
 }
 void setOnEndOfStack(vector<Proces>& vec, const string& in_str, const int& remainingTimeToExpropriation) {
@@ -104,11 +111,11 @@ void setOnEndOfStack(vector<Proces>& vec, const string& in_str, const int& remai
 
     for (int i = 0; i < in_str.length(); i++)
     {
-        if (in_str[i] == ' ' || i == in_str.length()) {
+        if (in_str[i] == ' ' || in_str[i] == '\n' || i == in_str.length()) {
             switch (counter)
             {
                 case 0:
-                    _currentTime = std::stoi(tmp);
+                    //_currentTime = std::stoi(tmp);
                     break;
                 case 1:
                     processId = std::stoi(tmp);
@@ -178,7 +185,7 @@ void expropriation(const int& strategyCode, const int& timeToExpropriation,vecto
                     {
                         stackProcesors[i].ActualProces.RemainingTimeToExpropriation = timeToExpropriation;
                         stackProcess.push_back(stackProcesors[i].ActualProces);
-                        stackProcesors[i].ActualProces = Proces();
+                        stackProcesors[i].ActualProces = Proces(-1,1,1,1);
                     }
                     if (stackProcesors[i].ActualProces.RemainingTimeToExpropriation < 0)
                     {
@@ -186,7 +193,7 @@ void expropriation(const int& strategyCode, const int& timeToExpropriation,vecto
                     }
                 }
                 if (stackProcesors[i].ActualProces.RemainingTimeToEndOfProces == 0)
-                    stackProcesors[i].ActualProces = Proces();
+                    stackProcesors[i].ActualProces = Proces(-1,1,1,1);
                 if (stackProcesors[i].ActualProces.RemainingTimeToEndOfProces < 0)
                     std::cout << "\n Error:  takeOffOnStack()  \n\n\n";
             }
@@ -201,11 +208,11 @@ void takeOffOnStack(vector<Proces>& stackProcess, vector<Processor>& stackProces
             if (stackProcesors[i].ActualProces.RemainingTimeToEndOfProces > 0)
             {
                 stackProcess.insert(stackProcess.begin(), stackProcesors[i].ActualProces);          //dodanie elementu na poczatek
-                stackProcesors[i].ActualProces = Proces();
+                stackProcesors[i].ActualProces = Proces(-1,1,1,1);
                 continue;
             }
             if (stackProcesors[i].ActualProces.RemainingTimeToEndOfProces == 0)
-                stackProcesors[i].ActualProces = Proces();
+                stackProcesors[i].ActualProces = Proces(-1,1,1,1);
             if (stackProcesors[i].ActualProces.RemainingTimeToEndOfProces < 0)
                 std::cout << "\n Error:  takeOffOnStack()  \n\n\n";
         }
@@ -253,13 +260,14 @@ int main(int argc, char** argv)
 {
     //std::vector<std::string> arguments(argv, argv + argc);
     int strategyCode = std::stoi(argv[1]); //5; // std::stoi(argv[1]);
+    int procesorsCount = 1;
+    int remainingTimeToExpropriation = 1;
 
 
-    int procesorsCount = std::stoi(argv[2]); //2; // std::stoi(argv[2]);
-    int remainingTimeToExpropriation = 3;//std::stoi(argv[3]); //3; // std::stoi(argv[3]);
-
-    
-
+    if (argc > 2)
+        procesorsCount = std::stoi(argv[2]); //2; // std::stoi(argv[2]);
+    if (argc > 3)
+        remainingTimeToExpropriation = std::stoi(argv[3]); //3; // std::stoi(argv[3]);
 
     vector<Proces> stackProcess;
     vector<Processor> stackProcesors;
@@ -267,15 +275,11 @@ int main(int argc, char** argv)
 
 
     int ccc = 0;
-    while (1) 
+    string in_str;        
+    
+    //wczytaj linie - dopisz do stosu
+    while (getline(std::cin, in_str)) 
     {
-        string in_str;
-        //wczytaj linie - dopisz do stosu
-        
-        if (ccc > 30)
-            return -1;
-
-        getline(std::cin, in_str);
         //in_str = getFileData()[ccc++];
         setOnEndOfStack(stackProcess, in_str, remainingTimeToExpropriation);
         //wywlasz
@@ -325,64 +329,64 @@ int main(int argc, char** argv)
 
 
 /*
-Szeregowanie procesów w œrodowisku jedno i wieloprocesowym - CO TO ZNACZY WIELOPROCESOWYM ???
+Szeregowanie procesï¿½w w ï¿½rodowisku jedno i wieloprocesowym - CO TO ZNACZY WIELOPROCESOWYM ???
 i  - numer procesu
 ri - czas wykonania
-pi - priorytet 0-... 0-najwy¿szy priorytet
+pi - priorytet 0-... 0-najwyï¿½szy priorytet
 
-argv[ {nazwa}{kod_liczbowy_strategi}{liczba_procesorów}{wielkoœæ_kwantu_czasu_do_wyw³aszczenia}{} ]
+argv[ {nazwa}{kod_liczbowy_strategi}{liczba_procesorï¿½w}{wielkoï¿½ï¿½_kwantu_czasu_do_wywï¿½aszczenia}{} ]
 
-Kody poszczególnych strategii:
+Kody poszczegï¿½lnych strategii:
 
-0 - strategia FCFS (bez wyw³aszczania)
-1 - strategia SJF (bez wyw³aszczania)
-2 - strategia SRTF (z wyw³aszczaniem)
-3 - strategia RR (z wyw³aszczaniem)
-4 - szeregowanie priorytetowe z wyw³aszczaniem, zadania o takich samych priorytetach szeregowane algorytmem FCFS
-5 - szeregowanie priorytetowe z wyw³aszczaniem, zadania o takich samych priorytetach szeregowane algorytmem SRTF
-6 - szeregowanie priorytetowe bez wyw³aszczania, zadania o takich samych priorytetach szeregowane algorytmem FCFS
+0 - strategia FCFS (bez wywï¿½aszczania)
+1 - strategia SJF (bez wywï¿½aszczania)
+2 - strategia SRTF (z wywï¿½aszczaniem)
+3 - strategia RR (z wywï¿½aszczaniem)
+4 - szeregowanie priorytetowe z wywï¿½aszczaniem, zadania o takich samych priorytetach szeregowane algorytmem FCFS
+5 - szeregowanie priorytetowe z wywï¿½aszczaniem, zadania o takich samych priorytetach szeregowane algorytmem SRTF
+6 - szeregowanie priorytetowe bez wywï¿½aszczania, zadania o takich samych priorytetach szeregowane algorytmem FCFS
 
-Strategie wieloprocesorowe - realizowane poprzez obsadzanie kolejnych procesorów
+Strategie wieloprocesorowe - realizowane poprzez obsadzanie kolejnych procesorï¿½w
 
-W przypadku nie rozstrzygniêcia pierwszeñstwa - najpierw najni¿szy numer - najni¿szy procesor
+W przypadku nie rozstrzygniï¿½cia pierwszeï¿½stwa - najpierw najniï¿½szy numer - najniï¿½szy procesor
 
-Dlugie zadania - wykonuj¹ sie na tym samym procesorze
+Dlugie zadania - wykonujï¿½ sie na tym samym procesorze
 
-Przychodz¹ce zadania - na koniec kolejki
-W przypadku algorytmu RR zadania wyw³aszczane z kolejnych procesorów (od najni¿szego numeru procesora) po zakoñczeniu swojego kwantu czasu s¹ umieszczane w kolejce za nowo przyby³ymi.
-Jeœli zadanie skoñczy siê przed up³ywem kwantu czasu, to nowe zadanie jest uruchamiane w tym samym momencie, i jego kwant czasu jest liczony od zera, niekoniecznie synchronicznie z kwantami czasu innych zadañ.
+Przychodzï¿½ce zadania - na koniec kolejki
+W przypadku algorytmu RR zadania wywï¿½aszczane z kolejnych procesorï¿½w (od najniï¿½szego numeru procesora) po zakoï¿½czeniu swojego kwantu czasu sï¿½ umieszczane w kolejce za nowo przybyï¿½ymi.
+Jeï¿½li zadanie skoï¿½czy siï¿½ przed upï¿½ywem kwantu czasu, to nowe zadanie jest uruchamiane w tym samym momencie, i jego kwant czasu jest liczony od zera, niekoniecznie synchronicznie z kwantami czasu innych zadaï¿½.
 
 Program wczytuje dane ze stdin (lub potok ale to raczej nie)
 
-Kolejne wiersze s¹ postaci:
+Kolejne wiersze sï¿½ postaci:
 t i pi ri j pj rj ...
-gdzie t oznacza bie¿¹c¹ chwilê czasu
+gdzie t oznacza bieï¿½ï¿½cï¿½ chwilï¿½ czasu
 
-Przyk³adowo zapis:      [czas]--[numer]--[priorytet]--[czas_wykonania]
+Przykï¿½adowo zapis:      [czas]--[numer]--[priorytet]--[czas_wykonania]
 0 1 0 8 2 1 5           [0]-{1}{0}{8}-{2}{1}{5}
 1                       [1]
 2                       [2]
 3 3 0 3                 [3]-{3}{0}{3}
 
-// trzeba bedzie zrobic inny program ktory sobie przeczyta ca³y plik
-// i przekieruje zawartoœæ linijka po linijce
+// trzeba bedzie zrobic inny program ktory sobie przeczyta caï¿½y plik
+// i przekieruje zawartoï¿½ï¿½ linijka po linijce
 // na stdin programu do szeregowania
-// najlepiej jakby wprowadziæ zw³okê Thread.Sleep(1000) miêdzy kolejnymi linijkami
+// najlepiej jakby wprowadziï¿½ zwï¿½okï¿½ Thread.Sleep(1000) miï¿½dzy kolejnymi linijkami
 // 
 
-Symulacja trwa do momentu wykonania siê wszystkich zadañ
-Komunikat wyœwietlany na wyjœciu musi byæ postaci:
+Symulacja trwa do momentu wykonania siï¿½ wszystkich zadaï¿½
+Komunikat wyï¿½wietlany na wyjï¿½ciu musi byï¿½ postaci:
 
 t p1 p2 .. pM
 
-gdzie t oznacza chwilê czasu, p1 p2 .. pM oznaczaj¹ numery zadañ, które maj¹ byæ wykonywane przez procesory 1..M pomiêdzy chwil¹ t a t+1. Jeœli procesor nie ma przydzielonego zadania jest to oznaczane numerem -1. Przyk³adowy zapis:
+gdzie t oznacza chwilï¿½ czasu, p1 p2 .. pM oznaczajï¿½ numery zadaï¿½, ktï¿½re majï¿½ byï¿½ wykonywane przez procesory 1..M pomiï¿½dzy chwilï¿½ t a t+1. Jeï¿½li procesor nie ma przydzielonego zadania jest to oznaczane numerem -1. Przykï¿½adowy zapis:
 
 10 -1 1 4 3             [10]-{proc1}{-1}-{proc2}{1}-{proc3}{4}-{proc4}{3}
 
 !! Tryb krokowy - TO PÓNIEJ :<
 
-1) przyjmowanie argumentów - na ich podstawie - wybor strategii
-np. szeregowanie priorytetowe z wyw³aszczaniem: strategia SRTF - Shortest Remaining Time First
+1) przyjmowanie argumentï¿½w - na ich podstawie - wybor strategii
+np. szeregowanie priorytetowe z wywï¿½aszczaniem: strategia SRTF - Shortest Remaining Time First
 
 class Procesor{
 }
@@ -391,32 +395,32 @@ int numer, priorytet, czas_wykonania
 }
 
 main:
--- przychodzi ci¹g liczb
--- rozdzielenie na procesy - mammy liste procesów
--- dodanie listy procesów do g³ównej listy procesów 
--- posortowanie g³ównej listy procesów wed³ug :: i to ju¿ zalo¿y od strategii!!! ::                 (priorytetów potem numerów - kube³ki + wstawianie?)
+-- przychodzi ciï¿½g liczb
+-- rozdzielenie na procesy - mammy liste procesï¿½w
+-- dodanie listy procesï¿½w do gï¿½ï¿½wnej listy procesï¿½w 
+-- posortowanie gï¿½ï¿½wnej listy procesï¿½w wedï¿½ug :: i to juï¿½ zaloï¿½y od strategii!!! ::                 (priorytetï¿½w potem numerï¿½w - kubeï¿½ki + wstawianie?)
 
 procesor:
-- je¿eli nie wykonuje ¿adnego procesu
-    - pobierz najbardziej priorytetowy proces z listy procesów 
-    - podziel proces na X podprocesów w zale¿noœci od: czas_wykonania / kwant_czasu
+- jeï¿½eli nie wykonuje ï¿½adnego procesu
+    - pobierz najbardziej priorytetowy proces z listy procesï¿½w 
+    - podziel proces na X podprocesï¿½w w zaleï¿½noï¿½ci od: czas_wykonania / kwant_czasu
     
 
 kwant czasu:
-    ?obsadŸ procesory taskami
-    !œci¹gnij pod_proces z listy na procesorze
+    ?obsadï¿½ procesory taskami
+    !ï¿½ciï¿½gnij pod_proces z listy na procesorze
 kwant czasu:
-    ?obsadŸ procesory taskami
-    !œci¹gnij pod_proces z listy na procesorze
+    ?obsadï¿½ procesory taskami
+    !ï¿½ciï¿½gnij pod_proces z listy na procesorze
 kwant czasu:
-    ?obsadŸ procesory taskami
-    !œci¹gnij pod_proces z listy na procesorze
+    ?obsadï¿½ procesory taskami
+    !ï¿½ciï¿½gnij pod_proces z listy na procesorze
 kwant czasu:
-    ?obsadŸ procesory taskami
-    !œci¹gnij pod_proces z listy na procesorze
+    ?obsadï¿½ procesory taskami
+    !ï¿½ciï¿½gnij pod_proces z listy na procesorze
 
-Strategi Bez Wyw³aszczania:     - lista pod_procesów zostaje na procesorze
-Strategia Z Wyw³aszczaniem:     - po czasie wyw³aszczenia (osobno liczony dla ka¿dego procka) policz czas potrzebny(który zosta³) do wykonania zadania i wrzuæ zadanie na koniec listy g³ównej procesów
+Strategi Bez Wywï¿½aszczania:     - lista pod_procesï¿½w zostaje na procesorze
+Strategia Z Wywï¿½aszczaniem:     - po czasie wywï¿½aszczenia (osobno liczony dla kaï¿½dego procka) policz czas potrzebny(ktï¿½ry zostaï¿½) do wykonania zadania i wrzuï¿½ zadanie na koniec listy gï¿½ï¿½wnej procesï¿½w
 
 
 
